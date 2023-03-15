@@ -1,10 +1,9 @@
 import sys
-import yaml
 import requests
 import pathlib
 import pytest
 
-from utils import _GALLERY_PATH, existing_examples
+from utils import _GALLERY_PATH, existing_examples, read_yml
 
 
 def examples_to_test():
@@ -21,11 +20,6 @@ def examples_to_test():
 def yml_path(request):
     return request.param
 
-def read_yml(yml_path):
-    with open(yml_path, "r") as f:
-        content = yaml.safe_load(f)
-    return content
-
 def check_example_data(yml_content):
     # "title" present and is non-empty
     assert "title" in yml_content
@@ -38,6 +32,7 @@ def check_example_data(yml_content):
     # "link_to_thumbnail" present and links to an image
     assert "link_to_thumbnail" in yml_content
     response = requests.head(yml_content["link_to_thumbnail"])
+    assert response.status_code == 200
     assert "image" in response.headers['content-type']
 
 def test_example(yml_path):
