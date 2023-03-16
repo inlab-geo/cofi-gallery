@@ -1,3 +1,4 @@
 pypandoc
 pyyaml
 pytest
+requests
