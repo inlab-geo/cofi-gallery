@@ -22,7 +22,7 @@ def collect_all():
 def mkdir_output_path(output_path):
     pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
 
-def load_thumbnail(yml_content, example_path):
+def load_thumbnail(yml_content, example_path, output_path):
     link_to_thumbnail = yml_content["link_to_thumbnail"]
     response = requests.get(link_to_thumbnail, stream=True)
     if response.status_code != 200:
@@ -30,7 +30,7 @@ def load_thumbnail(yml_content, example_path):
             f"unable to get image for {example_path} from {link_to_thumbnail}"
         )
     image_file = example_path.replace(".yml", ".png")
-    image_path = _output_path / image_file
+    image_path = output_path / image_file
     with open(image_path, "wb") as f:
         response.raw.decode_content = True
         shutil.copyfileobj(response.raw, f) 
@@ -40,7 +40,7 @@ def load_all_images(all_data, output_path):
     mkdir_output_path(output_path)
     all_images = []
     for (yml_content, example) in all_data:
-        img_file = load_thumbnail(yml_content, example)
+        img_file = load_thumbnail(yml_content, example, output_path)
         all_images.append(img_file)
     return all_images
 
@@ -75,7 +75,7 @@ THUMBNAIL_TEMPLATE = """
 
 .. only:: html
 
-  .. image:: /{thumbnail}
+  .. image:: {thumbnail}
     :alt:
 
 .. raw:: html
